@@ -1,14 +1,14 @@
-
 //SVG VARIABLES
-var width=1000;  //svg width
-var height=800; //svg height
 var margin=20; // the space between the edges of the svg
 var header=150; //the offset from top to chart
+var width=$(window).width()-margin;  //svg width
+var height=$(window).height()-margin; //svg height
+
 var svg = d3.select("body")
 			.append("svg")
-            .attr("width",width)
+         .attr("width",width)
 			.attr("height",height)
-			.attr("style","background: red;");
+			.attr("style","background: #ccd4e2;");
 
 //GROUP VARIABLES
 var charactergroup=svg.append("g").attr("id","charactergroup");
@@ -16,49 +16,27 @@ var moviegroup=svg.append("g").attr("id","moviegroup");
 
 //DATA VARIABLE
 var csvdata=[];
-var character=[];
-var movies=[];
+var characters=["character1","character2","character3","character4","character5","character6","character7","character8","character9","character10","character11","character12","character13",
+"character14","character15","character16","character17","character18","character19","character20","character21","character22","character23","character24","character25","character26",
+"character27","character28","character29","character30","character31","character32","character33","character34","character35"];
+var movies=["movie1","movie1","movie1","movie1","movie1","movie1","movie1","movie1","movie1","movie1","movie1","movie1","movie1","movie1","movie1","movie1"];
+var numberofcharacters=characters.length;
+var numberofmovies=movies.length;
 
-d3.csv("characters.csv",function(data){
+
+d3.csv("marvel_data.csv",function(data){
        data.forEach(function(d){
-         temp={
-			movie_name: d.moviename,
-			character_name: d.charactername,
-			time: d.screentime
+         //var tmp_char=JSON.parse(d.cast_crew);
+         var temp={
+			 id:d.id,
+			 title: d.title,
+			 characters:d.cast_crew
 		 };
-		 
-		//make character and movie array
-		var ctemp=d.charactername;
-		var mtemp=d.moviename;
-		var charfound=false;
-		var moviefound=false;
-		for(var i=0;i<character.length && !charfound;i++){
-			if(ctemp==character[i]){
-				charfound=true;
-			}
-		}
-		//if character not found add to list
-		if(!charfound){
-			character.push(ctemp);
-		}
-		
-		for(var i=0;i<movies.length && !moviefound; i++){
-			if(mtemp==movies[i]){
-				moviefound=true;
-			}
-		}
-		//if movie not found add to list
-		if(!moviefound){
-			movies.push(mtemp);
-		}
-		//add the data to csv data
-		csvdata.push(temp);
-   })
-	//VARIABLES
-	var numberofcharacters =characters.length;
-	var numberofmovies=movies.length;
-	
-	//CREATE LABLES
+		 csvdata.push(temp);
+    })
+
+
+	//CREATE LABELS
 	var characterlabels = svg.selectAll("charactergroup")
 					.data(characters)
 					.enter()
@@ -73,25 +51,42 @@ d3.csv("characters.csv",function(data){
 					.enter()
 					.append("text")
 					.text(function(d,i){return d.title;})
-					.attr("transform", function (d,i) {
-						var xText = ((width-180)/(numberofmovies+1)*(i+1)+50);
-						var yText = header;
-						return "translate(" + xText + "," + yText + ") rotate(-30)";
-					});
-	// VERTICLE LINES FOR ORGANIZATION		
-	var verticallines = svg.selectAll("moviegroup")
-					.data(movies)
-					.enter()
-					.append("line")
-					.attr("x1", function(d,i) {
-						return (width-180)/(numberofmovies+1)*(i+1)+30;
-					})
-					.attr("y1", header)
-					.attr("x2", function(d,i) {
-						return (width-180)/(numberofmovies+1)*(i+1)+30;
-					})
-					.attr("y2", height-margin)
-					.attr("stroke", "black");
+               .attr("transform", function (d,i) {
+                  var xText = ((width-180)/(numberofmovies+1)*(i+1)+60);
+                  var yText = header;
+                  return "translate(" + xText + "," + yText + ") rotate(-30)";
+               });
 
-	console.log(csvdata);
+
+   //DRAW LINES FOR ORGANIZATION
+   var index = 0;
+   var verticallines = svg.selectAll("moviegroup")
+               .data(movies)
+               .enter()
+               .append("line")
+               .attr("x1", function(d,i) {
+                  index++;
+                  return (width-180)/(numberofmovies+1)*(i+1)+30;
+               })
+               .attr("y1", header)
+               .attr("x2", function(d,i) {
+                  return (width-180)/(numberofmovies+1)*(i+1)+30;
+               })
+               .attr("y2", height-margin)
+               .attr("stroke", "#737984");
+
+   //Create the last line using regular Javascript because it's not bound to any data
+   var oneline = ["movie"];
+   var lastline = svg.selectAll("moviegroup")
+               .data(oneline)
+               .enter()
+               .append("line")
+               .attr("x1", (width-180)/(numberofmovies+1)*(index+1)+30)
+               .attr("y1", header)
+               .attr("x2", (width-180)/(numberofmovies+1)*(index+1)+30)
+               .attr("y2", height-margin)
+               .attr("stroke", "#737984");
+
+
+   console.log(csvdata);
 })
