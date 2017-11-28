@@ -1,14 +1,17 @@
+
 //SVG VARIABLES
+var width=1500;  //svg width
+//var height=800; //svg height
+var height=2500;
+//var width=$(window).width()-margin;  //svg width
+//var height=$(window).height()-margin; //svg height
 var margin=20; // the space between the edges of the svg
 var header=150; //the offset from top to chart
-var width=$(window).width()-margin;  //svg width
-var height=$(window).height()-margin; //svg height
-
 var svg = d3.select("body")
 			.append("svg")
-         .attr("width",width)
+            .attr("width",width)
 			.attr("height",height)
-			.attr("style","background: #ccd4e2;");
+			.attr("style","background: red;");
 
 //GROUP VARIABLES
 var charactergroup=svg.append("g").attr("id","charactergroup");
@@ -16,27 +19,49 @@ var moviegroup=svg.append("g").attr("id","moviegroup");
 
 //DATA VARIABLE
 var csvdata=[];
-var characters=["character1","character2","character3","character4","character5","character6","character7","character8","character9","character10","character11","character12","character13",
-"character14","character15","character16","character17","character18","character19","character20","character21","character22","character23","character24","character25","character26",
-"character27","character28","character29","character30","character31","character32","character33","character34","character35"];
-var movies=["movie1","movie1","movie1","movie1","movie1","movie1","movie1","movie1","movie1","movie1","movie1","movie1","movie1","movie1","movie1","movie1"];
-var numberofcharacters=characters.length;
-var numberofmovies=movies.length;
+var characters=[];
+var movies=[];
 
-
-d3.csv("marvel_data.csv",function(data){
+d3.csv("characters.csv",function(data){
        data.forEach(function(d){
-         //var tmp_char=JSON.parse(d.cast_crew);
-         var temp={
-			 id:d.id,
-			 title: d.title,
-			 characters:d.cast_crew
+        var temp={
+			moviename: d.moviename,
+			charactername: d.charactername,
+			time: d.screentime
 		 };
-		 csvdata.push(temp);
-    })
-
-
-	//CREATE LABELS
+		//make character and movie array
+		var ctemp=d.charactername;
+		var mtemp=d.moviename;
+		
+		var charfound=false;
+		var moviefound=false;
+		for(var i=0;i<characters.length && !charfound;i++){
+			if(ctemp==characters[i]){
+				charfound=true;
+			}
+		}
+		//if character not found add to list
+		if(!charfound){
+			characters.push(ctemp);
+		}
+		
+		for(var i=0;i<movies.length && !moviefound; i++){
+			if(mtemp==movies[i]){
+				moviefound=true;
+			}
+		}
+		//if movie not found add to list
+		if(!moviefound){
+			movies.push(mtemp);
+		}
+		//add the data to csv data
+		csvdata.push(temp);
+   })
+	//VARIABLES
+	var numberofcharacters =characters.length;
+	var numberofmovies=movies.length;
+	
+	//CREATE LABLES
 	var characterlabels = svg.selectAll("charactergroup")
 					.data(characters)
 					.enter()
@@ -47,18 +72,16 @@ d3.csv("marvel_data.csv",function(data){
 					.text(function(d,i){return characters[i];});
 
 	var movielabels=svg.selectAll("moviegroup")
-					.data(csvdata)
+					.data(movies)
 					.enter()
 					.append("text")
-					.text(function(d,i){return d.title;})
-               .attr("transform", function (d,i) {
-                  var xText = ((width-180)/(numberofmovies+1)*(i+1)+60);
-                  var yText = header;
-                  return "translate(" + xText + "," + yText + ") rotate(-30)";
-               });
-
-
-   //DRAW LINES FOR ORGANIZATION
+					.text(function(d,i){return movies[i];})
+					.attr("transform", function (d,i) {
+						var xText = ((width-180)/(numberofmovies+1)*(i+1)+50);
+						var yText = header;
+						return "translate(" + xText + "," + yText + ") rotate(-30)";
+					});
+	 //DRAW LINES FOR ORGANIZATION
    var index = 0;
    var verticallines = svg.selectAll("moviegroup")
                .data(movies)
@@ -86,7 +109,4 @@ d3.csv("marvel_data.csv",function(data){
                .attr("x2", (width-180)/(numberofmovies+1)*(index+1)+30)
                .attr("y2", height-margin)
                .attr("stroke", "#737984");
-
-
-   console.log(csvdata);
 })
