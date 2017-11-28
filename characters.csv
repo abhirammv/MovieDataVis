@@ -27,11 +27,11 @@ Thor: The Dark World,Loki,17.5
 Thor: Ragnarok,Loki,15
 Ant-Man,Scott Lang,50.5
 Captain America: Civil War,Scott Lang,5.5
-Iron Man,Col. James 'Rhodey' Rhodes,8.25
-Iron Man 2,Col. James 'Rhodey' Rhodes,18.75
-Iron Man 3,Col. James 'Rhodey' Rhodes,9.75
-Avengers: Age Of Ultron,Col. James 'Rhodey' Rhodes,2.5
-Captain America: Civil War,Col. James 'Rhodey' Rhodes,7.25
+Iron Man,Col. James Rhodes,8.25
+Iron Man 2,Col. James Rhodes,18.75
+Iron Man 3,Col. James Rhodes,9.75
+Avengers: Age Of Ultron,Col. James Rhodes,2.5
+Captain America: Civil War,Col. James Rhodes,7.25
 Iron Man,Nick Fury,0.25
 Iron Man 2,Nick Fury,5.5
 Thor,Nick Fury,0.75
@@ -164,8 +164,8 @@ Iron Man,Happy Hogan,1.25
 Iron Man 2,Happy Hogan,4.25
 Iron Man 3,Happy Hogan,6.25
 Spider-Man: Homecoming,Happy Hogan,6
-The Incredible Hulk,Gen. Thaddeus 'Thunderbolt' Ross,15
-Captain America: Civil War,Gen. Thaddeus 'Thunderbolt' Ross,2.75
+The Incredible Hulk,Gen. Thaddeus Ross,15
+Captain America: Civil War,Gen. Thaddeus Ross,2.75
 Doctor Strange,Ancient One,17.25
 Avengers: Age Of Ultron,Ultron,16.75
 Ant-Man,Hope van Dyne,15.75
@@ -203,7 +203,6 @@ Iron Man 3,Savin,6
 Iron Man,Christine Everhart,3.75
 Iron Man 2,Christine Everhart,1.5
 Ant-Man,Cassandra Lang,4.5
-Spider-Man: Homecoming,This character is no longer available,4.5
 Thor: The Dark World,The Collector,1.25
 Guardians Of The Galaxy,The Collector,2.5
 Thor: Ragnarok,Korg,3.75
