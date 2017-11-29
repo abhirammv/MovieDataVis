@@ -16,23 +16,58 @@ var svg = d3.select("body")
 //GROUP VARIABLES
 var charactergroup=svg.append("g").attr("id","charactergroup");
 var moviegroup=svg.append("g").attr("id","moviegroup");
+var timegroup=svg.append("g").attr("id","timegroup");
 
 //DATA VARIABLE
 var csvdata=[];
 var characters=[];
 var movies=[];
 
+function sortAlpha(a,b){
+	if(a.charactername < b.charactername && a.moviename < b.moviename){
+		return -1;
+	}else if(){
+		
+	}
+}
+
+function sortAlphaCharacter(a,b){
+	if(a.charactername < b.charactername)
+		return -1;
+	else if(a.charactername > b.charactername)
+		return 1;
+	else	
+		return 0;
+}
+
+function sortAlphaMovie(a,b){
+	if(a.moviename < b.moviename)
+		return -1;
+	else if(a.moviename > b.moviename)
+		return 1;
+	else	
+		return 0;
+}
+
 d3.csv("characters.csv",function(data){
        data.forEach(function(d){
+		//format incoming data
         var temp={
 			moviename: d.moviename,
 			charactername: d.charactername,
-			time: d.screentime
-		 };
+			time: +d.screentime
+		};
 		//make character and movie array
+		
+		//add the data to csv data
+		csvdata.push(temp);
+		
+		
+		
+		
+		
 		var ctemp=d.charactername;
 		var mtemp=d.moviename;
-		
 		var charfound=false;
 		var moviefound=false;
 		for(var i=0;i<characters.length && !charfound;i++){
@@ -54,9 +89,15 @@ d3.csv("characters.csv",function(data){
 		if(!moviefound){
 			movies.push(mtemp);
 		}
-		//add the data to csv data
-		csvdata.push(temp);
+		
    })
+    //Sort movie array alphabetically
+	movies.sort();
+	//Sort character array alphabetically
+	characters.sort();
+    //sort csv
+	csvdata.sort(sortAlphaCharacter);
+	csvdata.sort(sortAlphaMovie);
 	//VARIABLES
 	var numberofcharacters =characters.length;
 	var numberofmovies=movies.length;
@@ -81,9 +122,21 @@ d3.csv("characters.csv",function(data){
 						var yText = header;
 						return "translate(" + xText + "," + yText + ") rotate(-30)";
 					});
-	 //DRAW LINES FOR ORGANIZATION
-   var index = 0;
-   var verticallines = svg.selectAll("moviegroup")
+	//CREATE TIMEBOXS
+	for(var j=0;j<numberofmovies;j++){
+		var timeboxes=svg.selectAll("timegroup")
+					.data(characters)
+					.enter()
+					.append("rect")
+					.attr("x",function(d,i){return ((width-180)/(numberofmovies+1)*(j+1)+50);})
+					.attr("y",function(d,i){return ((height-margin-header)/(numberofcharacters+1)*(i+1)+margin/2+header);})
+					.attr("width",10)
+					.attr("height",10);
+	}
+	
+    //DRAW LINES FOR ORGANIZATION
+    var index = 0;
+    var verticallines = svg.selectAll("moviegroup")
                .data(movies)
                .enter()
                .append("line")
@@ -98,9 +151,9 @@ d3.csv("characters.csv",function(data){
                .attr("y2", height-margin)
                .attr("stroke", "#737984");
 
-   //Create the last line using regular Javascript because it's not bound to any data
-   var oneline = ["movie"];
-   var lastline = svg.selectAll("moviegroup")
+    //Create the last line using regular Javascript because it's not bound to any data
+    var oneline = ["movie"];
+    var lastline = svg.selectAll("moviegroup")
                .data(oneline)
                .enter()
                .append("line")
@@ -109,4 +162,6 @@ d3.csv("characters.csv",function(data){
                .attr("x2", (width-180)/(numberofmovies+1)*(index+1)+30)
                .attr("y2", height-margin)
                .attr("stroke", "#737984");
+			   
+	console.log(csvdata);
 })
