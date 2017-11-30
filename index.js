@@ -31,21 +31,49 @@ var title = d3.select("svg")
 var charactergroup=svg.append("g").attr("id","charactergroup");
 var moviegroup=svg.append("g").attr("id","moviegroup");
 var sidebargroup=svg.append("g").attr("id", "sidebargroup");
-
+var timegroup=svg.append("g").attr("id","timegroup");
 
 //DATA VARIABLE
 var csvdata=[];
 var characters=[];
 var movies=[];
 
+function sortAlpha(a,b){
+	if(a.charactername < b.charactername && a.moviename < b.moviename){
+		return -1;
+	}
+}
+
+function sortAlphaCharacter(a,b){
+	if(a.charactername < b.charactername)
+		return -1;
+	else if(a.charactername > b.charactername)
+		return 1;
+	else
+		return 0;
+}
+
+function sortAlphaMovie(a,b){
+	if(a.moviename < b.moviename)
+		return -1;
+	else if(a.moviename > b.moviename)
+		return 1;
+	else
+		return 0;
+}
+
 d3.csv("characters.csv",function(data){
        data.forEach(function(d){
-        var temp={
-			moviename: d.moviename,
-			charactername: d.charactername,
-			time: d.screentime
+         //format incoming data
+         var temp={
+			   moviename: d.moviename,
+			   charactername: d.charactername,
+			   time: +d.screentime
 		 };
 		//make character and movie array
+
+      //add the data to the csv data
+      csvdata.push(temp);
 		var ctemp=d.charactername;
 		var mtemp=d.moviename;
 
@@ -70,9 +98,17 @@ d3.csv("characters.csv",function(data){
 		if(!moviefound){
 			movies.push(mtemp);
 		}
-		//add the data to csv data
-		csvdata.push(temp);
+
    })
+
+      //Sort movie array alphabetically
+      movies.sort();
+      //Sort character array alphabetically
+      characters.sort();
+      //sort csv
+      csvdata.sort(sortAlphaCharacter);
+      csvdata.sort(sortAlphaMovie);
+
 	//VARIABLES
 	var numberofcharacters =characters.length;
 	var numberofmovies=movies.length;
@@ -97,7 +133,24 @@ d3.csv("characters.csv",function(data){
 						var yText = header;
 						return "translate(" + xText + "," + yText + ") rotate(-30)";
 					});
-	 //DRAW LINES FOR ORGANIZATION
+
+   //CREATE TIMEBOXES
+   for (var j = 0; j < numberofmovies; j++) {
+      var timeboxes = svg.selectAll("timegroup")
+               .data(characters)
+               .enter()
+               .append("rect")
+               .attr("x", function (d, i) {
+                  return ((chartwidth-180)/(numberofmovies+1)*(j+1)+(charcolumn-20));
+               })
+               .attr("y", function (d, i) {
+                  return ((height-margin-header)/(numberofcharacters+1)*(i+1)+margin/2+header);
+               })
+               .attr("width", 10)
+               .attr("height", 10);
+   }
+
+   //DRAW LINES FOR ORGANIZATION
    var index = 0;
    var verticallines = svg.selectAll("moviegroup")
                .data(movies)
@@ -132,16 +185,6 @@ d3.csv("characters.csv",function(data){
    var sideWidth = sidebarwidth-margin+70;
    var textX = sideX+15;
    var filters = ["alphabetical by character", "highest screentime", "movie release date", "chronological story order", "largest cast"];
-
-   //may be eliminated but just to draw the border so we can see where it is
-   /*var sidebar=d3.select("svg")
-               .append("rect")
-               .attr("x", sideX)
-               .attr("y", header)
-               .attr("width", sideWidth)
-               .attr("height", $(window).height()-header-margin)
-               .attr("fill", "#eff2f7")
-               .attr("stroke", "#737984");*/
 
    //TITLE
    var sidebarTitle=d3.select("svg")
