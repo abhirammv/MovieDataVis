@@ -66,33 +66,49 @@ function sortScreentime(a, b) {
 
 }
 
+//Character Sorts
+//sort csv by movie name and total time
+function sortTotalScreenTime(a,b){
+	if(a.time > b.time){
+		return -1;
+	}else if(a.time < b.time){
+		return 1;
+	}else{
+		return 0;
+	}
+}
+
 d3.csv("characters2.csv",function(data){
        data.forEach(function(d){
-         //format incoming data
-         var temp={
-			   moviename: d.moviename,
-			   charactername: d.charactername,
-			   screentime: parseFloat(d.time)
-		 };
-		//make character and movie array
-
-      //add the data to the csv data
-      csvdata.push(temp);
+        //format incoming data
+        var temp={
+			moviename: d.moviename,
+			charactername: d.charactername,
+		    screentime: parseFloat(d.time)
+		};
+        //add the data to the csv data
+        csvdata.push(temp);
+		//Temp variables for array creation
 		var ctemp=d.charactername;
 		var mtemp=d.moviename;
-
+		var ttemp=parseFloat(d.time);
 		var charfound=false;
 		var moviefound=false;
 		for(var i=0;i<characters.length && !charfound;i++){
-			if(ctemp==characters[i]){
+			if(ctemp==characters[i].name){
 				charfound=true;
+				characters[i].time+=ttemp;
 			}
 		}
 		//if character not found add to list
 		if(!charfound){
-			characters.push(ctemp);
+			var temp2={
+				name: ctemp,
+				time: ttemp
+			}
+			characters.push(temp2);
 		}
-
+		
 		for(var i=0;i<movies.length && !moviefound; i++){
 			if(mtemp==movies[i]){
 				moviefound=true;
@@ -103,13 +119,8 @@ d3.csv("characters2.csv",function(data){
 			movies.push(mtemp);
 		}
 
-   })
-
-
-      console.log("csvdata: " + csvdata[13].moviename + ", " + csvdata[13].charactername + ", " + csvdata[13].screentime);
-      console.log("movies: " + movies);
-      console.log("characters: " + characters);
-
+    })
+	//characters.sort(sortTotalScreenTime);
 
 	//VARIABLES
 	var numberofcharacters =characters.length;
@@ -123,7 +134,7 @@ d3.csv("characters2.csv",function(data){
 					.attr("x",margin/2)
 					//change height to account for margin    divide by number of characters+1 for formating   offset iterator by 1     shift by half the margin for formating
 					.attr("y",function(d,i){return ((height-margin-header)/(numberofcharacters+1)*(i+1)+margin/2+header);})
-					.text(function(d,i){return characters[i];});
+					.text(function(d,i){return characters[i].name;});
 
 	var movielabels=svg.selectAll("moviegroup")
 					.data(movies)
