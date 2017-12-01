@@ -43,14 +43,22 @@ function sortAlpha(a,b){
 		return -1;
 	}
 }
-
-function sortAlphaCharacter(a,b){
+//CSV SORTS
+//Sorts Characters Alphabetically Then By Movie Alphabetically
+function sortAlphaCharacterMovie(a,b){
 	if(a.charactername < b.charactername)
 		return -1;
 	else if(a.charactername > b.charactername)
 		return 1;
-	else
-		return 0;
+	else{
+		if(a.moviename < b.moviename){
+			return -1;
+		}else if(a.moviename > b.moviename){
+			return 1;
+		}else{
+			return 0;
+		}
+	}	
 }
 
 function sortAlphaMovie(a,b){
@@ -84,7 +92,8 @@ d3.csv("characters2.csv",function(data){
         var temp={
 			moviename: d.moviename,
 			charactername: d.charactername,
-		    screentime: parseFloat(d.time)
+		    screentime: parseFloat(d.time),
+			totalscreentime: d.totaltime
 		};
         //add the data to the csv data
         csvdata.push(temp);
@@ -119,9 +128,14 @@ d3.csv("characters2.csv",function(data){
 			movies.push(mtemp);
 		}
 
-    })
-	//characters.sort(sortTotalScreenTime);
 
+    })
+	console.log(csvdata);
+	//csvdata.sort(sortAlphaCharacterMovie);
+	//console.log(csvdata);
+	//console.log(characters);
+	//characters.sort(sortTotalScreenTime);
+	
 	//VARIABLES
 	var numberofcharacters =characters.length;
 	var numberofmovies=movies.length;
