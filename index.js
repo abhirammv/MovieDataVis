@@ -60,6 +60,21 @@ function sortAlphaCharacterMovie(a,b){
 		}
 	}	
 }
+//Sorts By TotalScreenTime Then Alphabetically By Movie
+function sortTotalScreenTimeAplhaMovie(a,b){
+	if(a.totalscreentime > b.totalscreentime){
+		return -1;
+	}else if(a.totalscreentime < b.totalscreentime){
+		return 1;
+	}else{
+		if(a.moviename < b.moviename)
+			return -1;
+		else if(a.moviename > b.moviename)
+			return 1;
+		else
+			return 0;
+	}
+}
 
 function sortAlphaMovie(a,b){
 	if(a.moviename < b.moviename)
@@ -93,7 +108,7 @@ d3.csv("characters2.csv",function(data){
 			moviename: d.moviename,
 			charactername: d.charactername,
 		    screentime: parseFloat(d.time),
-			totalscreentime: d.totaltime
+			totalscreentime: parseFloat(d.totaltime)
 		};
         //add the data to the csv data
         csvdata.push(temp);
@@ -130,11 +145,16 @@ d3.csv("characters2.csv",function(data){
 
 
     })
-	console.log(csvdata);
-	//csvdata.sort(sortAlphaCharacterMovie);
+	
+	csvdata.sort(sortAlphaCharacterMovie);
 	//console.log(csvdata);
-	//console.log(characters);
 	//characters.sort(sortTotalScreenTime);
+	//console.log(characters);
+	//csvdata.sort(sortTotalScreenTimeAplhaMovie);
+	//csvdata.sort(sortAlphaMovieCharacter);
+	console.log(csvdata);
+	
+	//DRAW DATA FUNCTION
 	
 	//VARIABLES
 	var numberofcharacters =characters.length;
@@ -161,68 +181,67 @@ d3.csv("characters2.csv",function(data){
 						return "translate(" + xText + "," + yText + ") rotate(-30)";
 					});
 
-   //CREATE TIMEBOXES
-   var offset = (chartwidth-180)/(numberofmovies+1);
-   var timeboxes=svg.selectAll("timegroup")
-               .data(csvdata)
-               .enter()
-               .append("rect")
-               .attr("x", function (d, i) {
-                  //120 = amt to translate by
-                  //return Math.floor((i)/numberofcharacters+1)*100;
-                  //return (chartwidth-180)/(numberofmovies+1)*(i+1)+(charcolumn-20);
-                  return (Math.floor((i)/numberofcharacters+1)*(offset))+charcolumn-20;
+	//CREATE TIMEBOXES	   
+	var offset = (chartwidth-180)/(numberofmovies+1);
+	var timeboxes=svg.selectAll("timegroup")
+				.data(csvdata)
+				.enter()
+				.append("rect")
+				.attr("x", function (d, i) {
+					//120 = amt to translate by
+					//return Math.floor((i)/numberofcharacters+1)*100;
+					//return (chartwidth-180)/(numberofmovies+1)*(i+1)+(charcolumn-20);
+					return (Math.floor((i)%numberofmovies+1)*(offset))+charcolumn-20;
 
-               })
-               .attr("y", function (d, i) {
-                  return ((height-margin-header) / (numberofcharacters+1) * Math.floor(i%numberofcharacters) + header+margin);
-               })
-               .attr("width", function (d,i) {
-                  var colW = (chartwidth-180)/(numberofmovies+1)-1;
-                  return d.screentime / 77.25 * (colW);
+				})
+				.attr("y", function (d, i) {
+					return (height-margin-header)/(numberofcharacters+1)*Math.floor(i/numberofmovies)+header+margin;
+				})
+				.attr("width", function (d,i) {
+					var colW = (chartwidth-180)/(numberofmovies+1)-1;
+					return d.screentime / 77.25 * (colW);
                   
-               })
-               //.attr("width", 10)
-               .attr("height", 10);
+				})
+				.attr("height", 10);
 
-   //DRAW LINES FOR ORGANIZATION
-   var index = 0;
-   var verticallines = svg.selectAll("moviegroup")
-               .data(movies)
-               .enter()
-               .append("line")
-               .attr("x1", function(d,i) {
-                  index++;
-                  return (chartwidth-180)/(numberofmovies+1)*(i+1)+(charcolumn-20);
-               })
-               .attr("y1", header)
-               .attr("x2", function(d,i) {
-                  return (chartwidth-180)/(numberofmovies+1)*(i+1)+(charcolumn-20);
-               })
-               .attr("y2", height-margin)
-               .attr("stroke", "#737984");
+	//DRAW LINES FOR ORGANIZATION
+	var index = 0;
+	var verticallines = svg.selectAll("moviegroup")
+				.data(movies)
+				.enter()
+				.append("line")
+				.attr("x1", function(d,i) {
+					index++;
+					return (chartwidth-180)/(numberofmovies+1)*(i+1)+(charcolumn-20);
+				})
+				.attr("y1", header)
+				.attr("x2", function(d,i) {
+					return (chartwidth-180)/(numberofmovies+1)*(i+1)+(charcolumn-20);
+				})
+				.attr("y2", height-margin)
+				.attr("stroke", "#737984");
 
-   //Create the last line
-   var oneline = ["movie"];
-   var lastline = svg.selectAll("moviegroup")
-               .data(oneline)
-               .enter()
-               .append("line")
-               .attr("x1", (chartwidth-180)/(numberofmovies+1)*(index+1)+(charcolumn-20))
-               .attr("y1", header)
-               .attr("x2", (chartwidth-180)/(numberofmovies+1)*(index+1)+(charcolumn-20))
-               .attr("y2", height-margin)
-               .attr("stroke", "#737984");
+	//Create the last line
+	var oneline = ["movie"];
+	var lastline = svg.selectAll("moviegroup")
+				.data(oneline)
+				.enter()
+				.append("line")
+				.attr("x1", (chartwidth-180)/(numberofmovies+1)*(index+1)+(charcolumn-20))
+				.attr("y1", header)
+				.attr("x2", (chartwidth-180)/(numberofmovies+1)*(index+1)+(charcolumn-20))
+				.attr("y2", height-margin)
+				.attr("stroke", "#737984");
 
 
-   //DRAW THE SIDEBAR
-   var sideX = width-sidebarwidth-70;
-   var sideWidth = sidebarwidth-margin+70;
-   var textX = sideX+15;
-   var filters = ["alphabetical by character", "highest screentime", "movie release date", "chronological story order", "largest cast"];
+	//DRAW THE SIDEBAR
+	var sideX = width-sidebarwidth-70;
+	var sideWidth = sidebarwidth-margin+70;
+	var textX = sideX+15;
+	var filters = ["alphabetical by character", "highest screentime", "movie release date", "chronological story order", "largest cast"];
 
-   //TITLE
-   var sidebarTitle=d3.select("svg")
+	//TITLE
+	var sidebarTitle=d3.select("svg")
                .append("text")
                .attr("x", textX)
                .attr("y", header+30)
@@ -230,7 +249,7 @@ d3.csv("characters2.csv",function(data){
                .style("font-style", "italic")
                .style("font-size", "18px");
 
-   var filterNames=svg.selectAll("body")
+	var filterNames=svg.selectAll("body")
                .data(filters)
                .enter()
                .append("a")
@@ -241,7 +260,7 @@ d3.csv("characters2.csv",function(data){
                .attr("y", function (d, i) { return header+50+(i*20);})
                .text(function (d) { return d; });
 
-   filterNames
+	filterNames
                .on("click", function () {
                   //function to redraw the data
                })
