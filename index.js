@@ -44,8 +44,21 @@ function sortAlpha(a,b){
 	}
 }
 //CSV SORTS
-//Sorts Characters Alphabetically Then By Movie Alphabetically
-function sortAlphaCharacterMovie(a,b){
+//--------------------------------------------------------------
+//TO DO LIST
+//--------------------------------------------------------------
+//1. Alphabetical Character -- Alphabetical Movie           (DONE)
+//2. Alphabetical Character -- Release Order				(DONE)
+//3. Alphabetical Character -- Chronological Order			(DONE)
+//4. Character Screen Time -- Alphabetical Movie			(DONE)
+//5. Character Screen Time -- Release Order Movie			(DONE)
+//6. Charatcer Screen Time -- Chronological Order Movie		(DONE)
+//
+//
+//--------------------------------------------------------------
+
+//1. Sorts By Alphabetical Character -- Alphabetical Movie
+function sortAlphaCharacterAlphaMovie(a,b){
 	if(a.charactername < b.charactername)
 		return -1;
 	else if(a.charactername > b.charactername)
@@ -60,21 +73,87 @@ function sortAlphaCharacterMovie(a,b){
 		}
 	}	
 }
-//Sorts By TotalScreenTime Then Alphabetically By Movie
+//2. Sorts By Character Screen Time -- Release Order Movie
+function sortAlphaCharacterReleaseOrder(a,b){
+	if(a.charactername < b.charactername)
+		return -1;
+	else if(a.charactername > b.charactername)
+		return 1;
+	else{
+		if(a.releaseorder < b.releaseorder){
+			return -1;
+		}else if(a.releaseorder > b.releaseorder){
+			return 1;
+		}else{
+			return 0;
+		}
+	}	
+}
+//3. Sorts By Alphabetical Character -- Chronological Order
+function sortAlphaCharacterChronoOrder(a,b){
+	if(a.charactername < b.charactername)
+		return -1;
+	else if(a.charactername > b.charactername)
+		return 1;
+	else{
+		if(a.chronoorder < b.chronoorder){
+			return -1;
+		}else if(a.chronoorder > b.chronoorder){
+			return 1;
+		}else{
+			return 0;
+		}
+	}
+}
+//4. Sorts By Character Screen Time -- Alphabetical Movie
 function sortTotalScreenTimeAplhaMovie(a,b){
 	if(a.totalscreentime > b.totalscreentime){
 		return -1;
 	}else if(a.totalscreentime < b.totalscreentime){
 		return 1;
 	}else{
-		if(a.moviename < b.moviename)
+		if(a.moviename < b.moviename){
 			return -1;
-		else if(a.moviename > b.moviename)
+		}else if(a.moviename > b.moviename){
 			return 1;
-		else
+		}else{
 			return 0;
+		}
 	}
 }
+//5. Sorts By Character Screen Time -- Release Order Movie
+function sortTotalScreenTimeReleaseOrder(a,b){
+	if(a.totalscreentime > b.totalscreentime){
+		return -1;
+	}else if(a.totalscreentime < b.totalscreentime){
+		return 1;
+	}else{
+		if(a.releaseorder < b.releaseorder){
+			return -1;
+		}else if(a.releaseorder > b.releaseorder){
+			return 1;
+		}else{
+			return 0;
+		}
+	}
+}
+//6. Charatcer Screen Time -- Chronological Order Movie
+function sortTotalScreenTimeChronoOrder(a,b){
+	if(a.totalscreentime > b.totalscreentime){
+		return -1;
+	}else if(a.totalscreentime < b.totalscreentime){
+		return 1;
+	}else{
+		if(a.chronoorder < b.chronoorder){
+			return -1;
+		}else if(a.chronoorder > b.chronoorder){
+			return 1;
+		}else{
+			return 0;
+		}
+	}
+}
+//Sort
 
 function sortAlphaMovie(a,b){
 	if(a.moviename < b.moviename)
@@ -85,9 +164,6 @@ function sortAlphaMovie(a,b){
 		return 0;
 }
 
-function sortScreentime(a, b) {
-
-}
 
 //Character Sorts
 //sort csv by movie name and total time
@@ -114,29 +190,32 @@ d3.csv("characters2.csv",function(data){
 		};
         //add the data to the csv data
         csvdata.push(temp);
+    })
+	//SORTS
+	
+	csvdata.sort(sortTotalScreenTimeChronoOrder);
+	console.log(csvdata);
+	
+	//BUILD LABEL ARRAYS
+	for(var i=0;i<csvdata.length;i++){
 		//Temp variables for array creation
-		var ctemp=d.charactername;
-		var mtemp=d.moviename;
-		var ttemp=parseFloat(d.time);
+		var ctemp=csvdata[i].charactername;
+		var mtemp=csvdata[i].moviename;
+		//var ttemp=csvdata[i].screentime;
 		var charfound=false;
 		var moviefound=false;
-		for(var i=0;i<characters.length && !charfound;i++){
-			if(ctemp==characters[i].name){
+		for(var j=0;j<characters.length && !charfound;j++){
+			if(ctemp==characters[j]){
 				charfound=true;
-				characters[i].time+=ttemp;
 			}
 		}
 		//if character not found add to list
 		if(!charfound){
-			var temp2={
-				name: ctemp,
-				time: ttemp
-			}
-			characters.push(temp2);
+			characters.push(ctemp);
 		}
-		
-		for(var i=0;i<movies.length && !moviefound; i++){
-			if(mtemp==movies[i]){
+			
+		for(var j=0;j<movies.length && !moviefound; j++){
+			if(mtemp==movies[j]){
 				moviefound=true;
 			}
 		}
@@ -144,18 +223,7 @@ d3.csv("characters2.csv",function(data){
 		if(!moviefound){
 			movies.push(mtemp);
 		}
-
-
-    })
-	
-	csvdata.sort(sortAlphaCharacterMovie);
-	//console.log(csvdata);
-	//characters.sort(sortTotalScreenTime);
-	//console.log(characters);
-	//csvdata.sort(sortTotalScreenTimeAplhaMovie);
-	//csvdata.sort(sortAlphaMovieCharacter);
-	console.log(csvdata);
-	
+	}
 	//DRAW DATA FUNCTION
 	
 	//VARIABLES
@@ -170,7 +238,7 @@ d3.csv("characters2.csv",function(data){
 					.attr("x",margin/2)
 					//change height to account for margin    divide by number of characters+1 for formating   offset iterator by 1     shift by half the margin for formating
 					.attr("y",function(d,i){return ((height-margin-header)/(numberofcharacters+1)*(i+1)+margin/2+header);})
-					.text(function(d,i){return characters[i].name;});
+					.text(function(d,i){return characters[i];});
 
 	var movielabels=svg.selectAll("moviegroup")
 					.data(movies)
