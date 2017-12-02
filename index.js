@@ -108,7 +108,9 @@ d3.csv("characters2.csv",function(data){
 			moviename: d.moviename,
 			charactername: d.charactername,
 		    screentime: parseFloat(d.time),
-			totalscreentime: parseFloat(d.totaltime)
+			totalscreentime: parseFloat(d.totaltime),
+			releaseorder: parseInt(d.release),
+			chronoorder: parseInt(d.chrono)
 		};
         //add the data to the csv data
         csvdata.push(temp);
