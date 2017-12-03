@@ -303,6 +303,7 @@ d3.csv("characters2.csv",function(data){
         csvdata.push(temp);
     })
 	//DRAWS DEFAULT DATA
+	csvdata.sort(sortAlphaCharacterAlphaMovie);
 	drawData();
 	
 	//DRAW THE SIDEBAR
