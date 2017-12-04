@@ -10,7 +10,7 @@ var charcolumn=110; //width of column for all the characters
 
 var svg = d3.select("body")
 			.append("svg")
-         .attr("width",width)
+			.attr("width",width)
 			.attr("height",height)
 			.attr("style","background: #fffff");
 
@@ -166,6 +166,7 @@ function filterSelection(ccf,cmf){//ccf= currentcharacterfilter cmf=currentmovie
 		buildArrays();
 		//do transition for character group-----------currently doesnt work
 		svg.selectAll("charactergroup")
+		//select("cg"+i)
 				.data(characters)
 				.transition()
 				.duration(2000)
@@ -354,7 +355,7 @@ function sortAlphaCharacterChronoOrder(a,b){
 	}
 }
 //4. Sorts By Character Screen Time -- Alphabetical Movie
-function sortTotalScreenTimeAplhaMovie(a,b){
+function sortTotalScreenTimeAlphaMovie(a,b){
 	if(a.totalscreentime > b.totalscreentime){
 		return -1;
 	}else if(a.totalscreentime < b.totalscreentime){
