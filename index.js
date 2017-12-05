@@ -29,6 +29,10 @@ var charactergroup=svg.append("g").attr("id","charactergroup");
 var moviegroup=svg.append("g").attr("id","moviegroup");
 var sidebargroup=svg.append("g").attr("id", "sidebargroup");
 var timegroup=svg.append("g").attr("id","timegroup");
+//VARIABLE
+var characterlabels;
+var movielabels;
+var timeboxes;
 
 //DATA VARIABLE
 var csvdata=[];
@@ -80,18 +84,19 @@ function drawData(){
 	//VARIABLES
 	var numberofcharacters =characters.length;
 	var numberofmovies=movies.length;
-
 	//CREATE LABLES
-	var characterlabels = svg.selectAll("charactergroup")
+	
+	characterlabels = svg.selectAll("charactergroup")
 					.data(characters)
 					.enter()
 					.append("text")
+					.attr("id","charactergroup")
 					.attr("x",margin/2)
 					//change height to account for margin    divide by number of characters+1 for formating   offset iterator by 1     shift by half the margin for formating
 					.attr("y",function(d,i){return ((height-margin-header)/(numberofcharacters+1)*(i+1)+margin/2+header);})
-					.text(function(d,i){return characters[i];});
+					.text(function(d,i){return characters[i];})	
 
-	var movielabels=svg.selectAll("moviegroup")
+	movielabels=svg.selectAll("moviegroup")
 					.data(movies)
 					.enter()
 					.append("text")
@@ -104,14 +109,11 @@ function drawData(){
 
 	//CREATE TIMEBOXES	   
 	var offset = (chartwidth-180)/(numberofmovies+1);
-	var timeboxes=svg.selectAll("timegroup")
+	timeboxes=svg.selectAll("timegroup")
 				.data(csvdata)
 				.enter()
 				.append("rect")
 				.attr("x", function (d, i) {
-					//120 = amt to translate by
-					//return Math.floor((i)/numberofcharacters+1)*100;
-					//return (chartwidth-180)/(numberofmovies+1)*(i+1)+(charcolumn-20);
 					return (Math.floor((i)%numberofmovies+1)*(offset))+charcolumn-20;
 
 				})
@@ -160,38 +162,66 @@ function filterSelection(ccf,cmf){//ccf= currentcharacterfilter cmf=currentmovie
 	//Alpha Alpha
 	if(ccf=="alpha" && cmf=="alpha"){
 		console.log("a a");
-		//Resort data for current filter
 		csvdata.sort(sortAlphaCharacterAlphaMovie);
-		//sorts character and movie arrays
-		buildArrays();
-		//do transition for character group-----------currently doesnt work
-		svg.selectAll("charactergroup")
-		//select("cg"+i)
-				.data(characters)
-				.transition()
-				.duration(2000)
-				.attr("x",margin/2)
-				.attr("y",function(d,i){return ((height-margin-header)/(numberofcharacters+1)*(i+1)+margin/2+header);});
+		characterlabels.remove();
+		movielabels.remove();
+		timeboxes.remove();
+		drawData();
 	}
 	//Alpha Release
 	else if(ccf=="alpha" && cmf=="release"){
+		//working code for redrawing based on filter
 		console.log("a r");
+		csvdata.sort(sortAlphaCharacterReleaseOrder);
+		characterlabels//.transition()
+				//.duration(2000)
+				//.style("fill-opacity",0)
+				.remove();
+		movielabels//.transition()
+				//.duration(2000)
+				//.style("fill-opacity",0)
+				.remove();
+		timeboxes//.transition()
+				//.duration(2000)
+				//.style("opacity",0)
+				.remove();
+		drawData();
+		
 	}
 	//Alpha Chrono
 	else if(ccf=="alpha" && cmf=="chrono"){
 		console.log("a c");
+		csvdata.sort(sortAlphaCharacterChronoOrder);
+		characterlabels.remove();
+		movielabels.remove();
+		timeboxes.remove();
+		drawData();
 	}
 	//Screentime Alpha
 	else if(ccf=="screentime" && cmf=="alpha"){
 		console.log("s a");
+		csvdata.sort(sortTotalScreenTimeAlphaMovie);
+		characterlabels.remove();
+		movielabels.remove();
+		timeboxes.remove();
+		drawData();
 	}
 	//Screentime Release
 	else if(ccf=="screentime" && cmf=="release"){
-		console.log("s r");
+		csvdata.sort(sortTotalScreenTimeReleaseOrder);
+		characterlabels.remove();
+		movielabels.remove();
+		timeboxes.remove();
+		drawData();
 	}
 	//Screentime Chrono
 	else if(ccf=="screentime" && cmf=="chrono"){
 		console.log("s c");
+		csvdata.sort(sortTotalScreenTimeChronoOrder);
+		characterlabels.remove();
+		movielabels.remove();
+		timeboxes.remove();
+		drawData();
 	}else{
 		console.log("default");
 		//verticallines.attr("stroke","red");
@@ -418,6 +448,7 @@ d3.csv("characters2.csv",function(data){
         csvdata.push(temp);
     })
 	//DRAWS DEFAULT DATA
+	var datagroup=svg.append("g").attr("id","datagroup");
 	csvdata.sort(sortAlphaCharacterAlphaMovie);
 	drawData();
 	//DRAW THE SIDEBAR (FILTERS)
