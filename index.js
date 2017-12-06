@@ -8,9 +8,10 @@ var height=2500; //svg height
 var chartwidth=width-sidebarwidth; //space for sidebar on right
 var charcolumn=110; //width of column for all the characters
 
+
 var svg = d3.select("body")
 			.append("svg")
-			.attr("width",width)
+         .attr("width",width)
 			.attr("height",height)
 			.attr("style","background: #fffff");
 
@@ -29,10 +30,6 @@ var charactergroup=svg.append("g").attr("id","charactergroup");
 var moviegroup=svg.append("g").attr("id","moviegroup");
 var sidebargroup=svg.append("g").attr("id", "sidebargroup");
 var timegroup=svg.append("g").attr("id","timegroup");
-//VARIABLE
-var characterlabels;
-var movielabels;
-var timeboxes;
 
 //DATA VARIABLE
 var csvdata=[];
@@ -66,7 +63,7 @@ function buildArrays(){
 		if(!charfound){
 			characters.push(ctemp);
 		}
-			
+
 		for(var j=0;j<movies.length && !moviefound; j++){
 			if(mtemp==movies[j]){
 				moviefound=true;
@@ -76,46 +73,108 @@ function buildArrays(){
 		if(!moviefound){
 			movies.push(mtemp);
 		}
-	}	
+	}
 }
+
 //Draws the character and movie labels along with rectangles for the first time
 function drawData(){
+
+   //HEX COLOR VARIABLES
+   var timeboxColor = "#134dc1";          //dark blue
+   var timeboxHoverColor = "#ffb600";     //orange
+   var bgRectColor = "#f2f2f2";           //light gray
+   var bgRectHoverColor = "#e3edf2";      //light blue
+
 	buildArrays();
 	//VARIABLES
 	var numberofcharacters =characters.length;
 	var numberofmovies=movies.length;
+
+   //CREATE BACKGROUND LINES
+   var horizontalbars = svg.selectAll("charactergroup")
+               .data(characters)
+               .enter()
+               .append("rect")
+               .attr("id", function (d) {
+                  var idOld = d;
+                  var idNew = d.replace(/[.' ]/g,"");
+                  return idNew;
+               })
+               .attr("class", function (d) {
+                  var idOld = d;
+                  var idNew = d.replace(/[.' ]/g,"");
+                  return (idNew+"class");
+               })
+               .attr("x", margin/2)
+               .attr("y", function(d,i){return ((height-margin-header)/(numberofcharacters+1)*(i+1)+margin/2+header)-13;})
+               .attr("width", chartwidth-charcolumn+(margin/2))
+               .attr("height", 16)
+               .attr("fill", bgRectColor)
+               .on("mouseover", function(d,i){
+                  var thisID = this.id;
+                  d3.selectAll("rect#"+thisID).attr("fill", timeboxHoverColor);
+                  d3.select(this).attr("fill", bgRectHoverColor);
+               })
+               .on("mouseout", function (d,i) {
+                  var thisID = this.id;
+                  d3.selectAll("rect#"+thisID).attr("fill", timeboxColor);
+                  d3.select(this).attr("fill", bgRectColor);
+               });
+
+console.log("----------------");
+
 	//CREATE LABLES
-	
-	characterlabels = svg.selectAll("charactergroup")
+	var characterlabels = svg.selectAll("charactergroup")
 					.data(characters)
 					.enter()
 					.append("text")
-					.attr("id","charactergroup")
+               .attr("id", function (d) {
+                  var idOld = d;
+                  var idNew = d.replace(/[.' ]/g,"");
+                  return idNew;
+               })
 					.attr("x",margin/2)
 					//change height to account for margin    divide by number of characters+1 for formating   offset iterator by 1     shift by half the margin for formating
 					.attr("y",function(d,i){return ((height-margin-header)/(numberofcharacters+1)*(i+1)+margin/2+header);})
-					.text(function(d,i){return characters[i];})	
+					.text(function(d,i){return characters[i];})
+               .on("mouseover", function (d,i) {
+                  var thisID = this.id;
+                  var thisClass = this.id+"class";
+                  d3.selectAll("rect#"+thisID).attr("fill", timeboxHoverColor);
+                  d3.selectAll("rect."+thisClass).attr("fill", bgRectHoverColor);
+               })
+               .on("mouseout", function (d,i){
+                  var thisID = this.id;
+                  var thisClass = this.id+"class";
+                  d3.selectAll("rect#"+thisID).attr("fill", timeboxColor);
+                  d3.selectAll("rect."+thisClass).attr("fill", bgRectColor);
+               });
 
-	movielabels=svg.selectAll("moviegroup")
+	var movielabels=svg.selectAll("moviegroup")
 					.data(movies)
 					.enter()
 					.append("text")
 					.text(function(d,i){return movies[i];})
 					.attr("transform", function (d,i) {
 						var xText = ((chartwidth-180)/(numberofmovies+1)*(i+1)+charcolumn);
-						var yText = header;
+						var yText = header+margin/2;
 						return "translate(" + xText + "," + yText + ") rotate(-30)";
 					});
 
-	//CREATE TIMEBOXES	   
+	//CREATE TIMEBOXES
 	var offset = (chartwidth-180)/(numberofmovies+1);
-	timeboxes=svg.selectAll("timegroup")
+	var timeboxes=svg.selectAll("timegroup")
 				.data(csvdata)
 				.enter()
 				.append("rect")
+            .attr("id", function (d,i) {
+               var idOld = d.charactername;
+               var idNew = d.charactername.replace(/[.' ]/g,"");
+               console.log("box#: "+i+", id: "+idNew);
+               return idNew;
+            })
 				.attr("x", function (d, i) {
 					return (Math.floor((i)%numberofmovies+1)*(offset))+charcolumn-20;
-
 				})
 				.attr("y", function (d, i) {
 					return (height-margin-header)/(numberofcharacters+1)*Math.floor(i/numberofmovies)+header+margin;
@@ -123,9 +182,22 @@ function drawData(){
 				.attr("width", function (d,i) {
 					var colW = (chartwidth-180)/(numberofmovies+1)-1;
 					return d.screentime / 77.25 * (colW);
-                  
 				})
-				.attr("height", 10);
+				.attr("height", 16)
+            .attr("fill", timeboxColor)
+            .on("mouseover", function (d,i) {
+               var thisID = this.id;
+               var thisClass = this.id+"class";
+               d3.selectAll("rect#"+thisID).attr("fill", timeboxHoverColor);
+               d3.selectAll("rect."+thisClass).attr("fill", bgRectHoverColor);
+            })
+            .on("mouseout", function (d,i){
+               var thisID = this.id;
+               var thisClass = this.id+"class";
+               d3.selectAll("rect#"+thisID).attr("fill", timeboxColor);
+               d3.selectAll("rect."+thisClass).attr("fill", bgRectColor);
+            })
+            ;
 
 	//DRAW LINES FOR ORGANIZATION
 	var index = 0;
@@ -137,11 +209,11 @@ function drawData(){
 					index++;
 					return (chartwidth-180)/(numberofmovies+1)*(i+1)+(charcolumn-20);
 				})
-				.attr("y1", header)
+				.attr("y1", header+margin)
 				.attr("x2", function(d,i) {
 					return (chartwidth-180)/(numberofmovies+1)*(i+1)+(charcolumn-20);
 				})
-				.attr("y2", height-margin)
+				.attr("y2", height-margin-10)
 				.attr("stroke", "#737984");
 
 	//Create the last line
@@ -151,10 +223,14 @@ function drawData(){
 				.enter()
 				.append("line")
 				.attr("x1", (chartwidth-180)/(numberofmovies+1)*(index+1)+(charcolumn-20))
-				.attr("y1", header)
+				.attr("y1", header+margin)
 				.attr("x2", (chartwidth-180)/(numberofmovies+1)*(index+1)+(charcolumn-20))
-				.attr("y2", height-margin)
+				.attr("y2", height-margin-10)
 				.attr("stroke", "#737984");
+
+
+
+
 }
 //Used to determine which transition to do based on current filter selections
 //then does the transition
@@ -162,66 +238,37 @@ function filterSelection(ccf,cmf){//ccf= currentcharacterfilter cmf=currentmovie
 	//Alpha Alpha
 	if(ccf=="alpha" && cmf=="alpha"){
 		console.log("a a");
+		//Resort data for current filter
 		csvdata.sort(sortAlphaCharacterAlphaMovie);
-		characterlabels.remove();
-		movielabels.remove();
-		timeboxes.remove();
-		drawData();
+		//sorts character and movie arrays
+		buildArrays();
+		//do transition for character group-----------currently doesnt work
+		svg.selectAll("charactergroup")
+				.data(characters)
+				.transition()
+				.duration(2000)
+				.attr("x",margin/2)
+				.attr("y",function(d,i){return ((height-margin-header)/(numberofcharacters+1)*(i+1)+margin/2+header);});
 	}
 	//Alpha Release
 	else if(ccf=="alpha" && cmf=="release"){
-		//working code for redrawing based on filter
 		console.log("a r");
-		csvdata.sort(sortAlphaCharacterReleaseOrder);
-		characterlabels//.transition()
-				//.duration(2000)
-				//.style("fill-opacity",0)
-				.remove();
-		movielabels//.transition()
-				//.duration(2000)
-				//.style("fill-opacity",0)
-				.remove();
-		timeboxes//.transition()
-				//.duration(2000)
-				//.style("opacity",0)
-				.remove();
-		drawData();
-		
 	}
 	//Alpha Chrono
 	else if(ccf=="alpha" && cmf=="chrono"){
 		console.log("a c");
-		csvdata.sort(sortAlphaCharacterChronoOrder);
-		characterlabels.remove();
-		movielabels.remove();
-		timeboxes.remove();
-		drawData();
 	}
 	//Screentime Alpha
 	else if(ccf=="screentime" && cmf=="alpha"){
 		console.log("s a");
-		csvdata.sort(sortTotalScreenTimeAlphaMovie);
-		characterlabels.remove();
-		movielabels.remove();
-		timeboxes.remove();
-		drawData();
 	}
 	//Screentime Release
 	else if(ccf=="screentime" && cmf=="release"){
-		csvdata.sort(sortTotalScreenTimeReleaseOrder);
-		characterlabels.remove();
-		movielabels.remove();
-		timeboxes.remove();
-		drawData();
+		console.log("s r");
 	}
 	//Screentime Chrono
 	else if(ccf=="screentime" && cmf=="chrono"){
 		console.log("s c");
-		csvdata.sort(sortTotalScreenTimeChronoOrder);
-		characterlabels.remove();
-		movielabels.remove();
-		timeboxes.remove();
-		drawData();
 	}else{
 		console.log("default");
 		//verticallines.attr("stroke","red");
@@ -247,7 +294,7 @@ function drawFilters(){
                .text("character filter:")
                .style("font-style", "italic")
                .style("font-size", "18px");
-	//Draw Filters		   
+	//Draw Filters
 	var filterCharacters=svg.selectAll("body")
                .data(characterfilters)
                .enter()
@@ -257,7 +304,7 @@ function drawFilters(){
                .attr("x", textX)
                .attr("y", function (d, i) { return header+50+(i*20);})
                .text(function (d) { return d; });
-			   
+
 	filterCharacters.on("click",function(){
 					if(d3.select(this).text()=="alphabetically"){
 						//set the filter
@@ -265,11 +312,13 @@ function drawFilters(){
 						//call the selection function
 						filterSelection(currentcharacterfilter,currentmoviefilter);
 					}else if(d3.select(this).text()=="total screen time"){
-						currentcharacterfilter="screentime";	
-						filterSelection(currentcharacterfilter,currentmoviefilter);						
+						currentcharacterfilter="screentime";
+						filterSelection(currentcharacterfilter,currentmoviefilter);
 					}else{
 						console.log("invaild character filter click...");
 					}
+
+               d3.select(this).style("color", "yellow");
                })
                .on("mouseover", function(d,i) {
                   filterCharacters.style("cursor", "pointer")
@@ -287,7 +336,7 @@ function drawFilters(){
                .text("movie filter:")
                .style("font-style", "italic")
                .style("font-size", "18px");
-	//Draw Filters		   
+	//Draw Filters
 	var filterMovies=svg.selectAll("body")
                .data(moviefilters)
                .enter()
@@ -298,7 +347,7 @@ function drawFilters(){
                .attr("x", textX)
                .attr("y", function (d, i) { return header+200+(i*20);})
                .text(function (d) { return d; });
-			   
+
 	filterMovies.on("click", function () {
 					if(d3.select(this).text()=="alphabetically"){
 						currentmoviefilter="alpha";
@@ -350,7 +399,7 @@ function sortAlphaCharacterAlphaMovie(a,b){
 		}else{
 			return 0;
 		}
-	}	
+	}
 }
 //2. Sorts By Character Screen Time -- Release Order Movie
 function sortAlphaCharacterReleaseOrder(a,b){
@@ -366,7 +415,7 @@ function sortAlphaCharacterReleaseOrder(a,b){
 		}else{
 			return 0;
 		}
-	}	
+	}
 }
 //3. Sorts By Alphabetical Character -- Chronological Order
 function sortAlphaCharacterChronoOrder(a,b){
@@ -439,7 +488,7 @@ d3.csv("characters2.csv",function(data){
         var temp={
 			moviename: d.moviename,
 			charactername: d.charactername,
-		    screentime: parseFloat(d.time),
+		   screentime: parseFloat(d.time),
 			totalscreentime: parseFloat(d.totaltime),
 			releaseorder: parseInt(d.release),
 			chronoorder: parseInt(d.chrono)
@@ -448,9 +497,8 @@ d3.csv("characters2.csv",function(data){
         csvdata.push(temp);
     })
 	//DRAWS DEFAULT DATA
-	var datagroup=svg.append("g").attr("id","datagroup");
 	csvdata.sort(sortAlphaCharacterAlphaMovie);
-	drawData();
+   drawData();
 	//DRAW THE SIDEBAR (FILTERS)
 	drawFilters();
 })
