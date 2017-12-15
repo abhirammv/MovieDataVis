@@ -197,7 +197,7 @@ function drawData(){
                d3.selectAll("rect#"+thisID).attr("fill", timeboxHoverColor);
                d3.selectAll("rect."+thisClass).attr("fill", bgRectHoverColor);
 
-               tooltip.html(d.charactername+"<br/>"+d.moviename)
+               tooltip.html("movie: "+d.moviename+"<br/>character: "+d.charactername+"<br/>screentime: "+d.screentime+" minutes")
                   //.attr("x", 600)
                   //.attr("y", 600)
                   .style("transform", "translate("+ (width-sidebarwidth-60)+"px,"+(-height+header+300)+"px)")
@@ -562,8 +562,6 @@ d3.csv("characters2.csv",function(data){
         //add the data to the csv data
         csvdata.push(temp);
     })
-
-   //DRAW SETUP LINES
 
 
 	//DRAWS DEFAULT DATA
